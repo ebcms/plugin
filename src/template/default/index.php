@@ -5,7 +5,7 @@
         function change(name, disabled) {
             $.ajax({
                 type: "POST",
-                url: "{:$router->build('/ebcms/plugin/disable')}",
+                url: "{echo $router->build('/ebcms/plugin/disable')}",
                 data: {
                     name: name,
                     disabled: disabled
@@ -28,7 +28,7 @@
             if (confirm('确定彻底删除该插件吗？删除后无法恢复！')) {
                 $.ajax({
                     type: "POST",
-                    url: "{:$router->build('/ebcms/plugin/delete')}",
+                    url: "{echo $router->build('/ebcms/plugin/delete')}",
                     data: {
                         name: name
                     },
@@ -50,7 +50,7 @@
             if (confirm('确定安装该插件吗？')) {
                 $.ajax({
                     type: "POST",
-                    url: "{:$router->build('/ebcms/plugin/install')}",
+                    url: "{echo $router->build('/ebcms/plugin/install')}",
                     data: {
                         name: name
                     },
@@ -72,7 +72,7 @@
             if (confirm('确定卸载该插件吗？')) {
                 $.ajax({
                     type: "POST",
-                    url: "{:$router->build('/ebcms/plugin/uninstall')}",
+                    url: "{echo $router->build('/ebcms/plugin/uninstall')}",
                     data: {
                         name: name
                     },
