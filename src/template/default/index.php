@@ -12,10 +12,10 @@
                 },
                 dataType: "JSON",
                 success: function(response) {
-                    if (response.code) {
-                        alert(response.message);
-                    } else {
+                    if (response.code == 0) {
                         location.reload();
+                    } else {
+                        alert(response.message);
                     }
                 },
                 error: function() {
@@ -109,17 +109,44 @@
                     <div class="mt-0 mb-2"><strong>{$vo['title']??$name}</strong></div>
                     <div class="text-muted">{$vo['description']??'暂无介绍'}</div>
                     <div class="position-absolute bottom-0 start-0">
-                        {if $vo['_install']}
-                        {if $vo['_disabled']}
-                        <a class="btn btn-sm btn-outline-secondary" style="cursor:pointer;" href="javascript:change('{$name}', 0);" data-bs-toggle="tooltip" title="应用已停用，点此切换">未运行...</a>
-                        <a class="btn btn-sm btn-outline-secondary" style="cursor:pointer;" href="javascript:uninstall('{$name}');" data-bs-toggle="tooltip" title="点此卸载此插件">卸载</a>
-                        {else}
-                        <a class="btn btn-sm btn-success" style="cursor:pointer;" href="javascript:change('{$name}', 1);" data-bs-toggle="tooltip" title="应用运行中，点此切换">运行中...</a>
-                        {/if}
-                        {else}
-                        <a class="btn btn-sm btn-outline-danger" style="cursor:pointer;" href="javascript:install('{$name}');" data-bs-toggle="tooltip" title="该插件未安装，点此安装">安装</a>
-                        <a class="btn btn-sm btn-outline-secondary" style="cursor:pointer;" href="javascript:del('{$name}');" data-bs-toggle="tooltip" title="彻底删除该插件">删除</a>
-                        {/if}
+                        <div class="dropdown">
+                            {if $vo['_install']}
+                            {if $vo['_disabled']}
+                            <button class="btn btn-warning btn-sm dropdown-toggle" type="button" id="dropdownMenu_{$name}" data-bs-toggle="dropdown" aria-expanded="false">
+                                未运行
+                            </button>
+                            {else}
+                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenu_{$name}" data-bs-toggle="dropdown" aria-expanded="false">
+                                运行中
+                            </button>
+                            {/if}
+                            {else}
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenu_{$name}" data-bs-toggle="dropdown" aria-expanded="false">
+                                未安装
+                            </button>
+                            {/if}
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu_{$name}">
+                                {if $vo['_install']}
+                                {if $vo['_disabled']}
+                                <li><button class="dropdown-item" type="button" onclick="change('{$name}', 0);" data-bs-toggle="tooltip" title="应用未运行，点此切换">运行</button></li>
+                                <li><button class="dropdown-item" type="button" onclick="uninstall('{$name}');" data-bs-toggle="tooltip" title="点此卸载此插件">卸载</button></li>
+                                {else}
+                                <li><button class="dropdown-item" type="button" onclick="change('{$name}', 1);" data-bs-toggle="tooltip" title="应用运行中，点此切换">停止</button></li>
+                                {/if}
+                                {else}
+                                <li><button class="dropdown-item" type="button" onclick="install('{$name}');" data-bs-toggle="tooltip" title="该插件未安装，点此安装">安装</button></li>
+                                <li><button class="dropdown-item" type="button" onclick="del('{$name}');" data-bs-toggle="tooltip" title="彻底删除该插件">删除</button></li>
+                                {/if}
+                                {if $vo['_menus']}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                {foreach $vo['_menus'] as $m}
+                                <li><a class="dropdown-item" href="{$m.url}">{$m.title}</a></li>
+                                {/foreach}
+                                {/if}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
