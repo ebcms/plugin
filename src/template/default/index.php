@@ -12,7 +12,7 @@
                 },
                 dataType: "JSON",
                 success: function(response) {
-                    if (!response.status) {
+                    if (response.code) {
                         alert(response.message);
                     } else {
                         location.reload();
@@ -35,7 +35,7 @@
                     dataType: "JSON",
                     success: function(response) {
                         alert(response.message);
-                        if (response.status) {
+                        if (response.code == 0) {
                             location.reload();
                         }
                     },
@@ -57,7 +57,7 @@
                     dataType: "JSON",
                     success: function(response) {
                         alert(response.message);
-                        if (response.status) {
+                        if (response.code == 0) {
                             location.reload();
                         }
                     },
@@ -79,7 +79,7 @@
                     dataType: "JSON",
                     success: function(response) {
                         alert(response.message);
-                        if (response.status) {
+                        if (response.code == 0) {
                             location.reload();
                         }
                     },
