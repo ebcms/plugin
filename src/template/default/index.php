@@ -34,9 +34,10 @@
                     },
                     dataType: "JSON",
                     success: function(response) {
-                        alert(response.message);
                         if (response.code == 0) {
                             location.reload();
+                        } else {
+                            alert(response.message);
                         }
                     },
                     error: function() {
@@ -56,9 +57,10 @@
                     },
                     dataType: "JSON",
                     success: function(response) {
-                        alert(response.message);
                         if (response.code == 0) {
                             location.reload();
+                        } else {
+                            alert(response.message);
                         }
                     },
                     error: function() {
@@ -78,9 +80,10 @@
                     },
                     dataType: "JSON",
                     success: function(response) {
-                        alert(response.message);
                         if (response.code == 0) {
                             location.reload();
+                        } else {
+                            alert(response.message);
                         }
                     },
                     error: function() {
