@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Http;
 
 use App\Ebcms\Admin\Http\Common;
-use DigPHP\Framework\Framework;
+use Composer\Autoload\ClassLoader;
+use Composer\InstalledVersions;
 use DigPHP\Request\Request;
-
-use function Composer\Autoload\includeFile;
+use Ebcms\Framework\Framework;
 
 class Install extends Common
 {
@@ -16,15 +16,26 @@ class Install extends Common
         Request $request
     ) {
         $name = $request->post('name');
+        if (InstalledVersions::isInstalled($name)) {
+            return $this->error('系统应用不支持该操作！');
+        }
 
-        $install_lock = Framework::getRoot() . '/config/plugin/' . $name . '/install.lock';
+        $install_lock = Framework::getRoot() . '/config/' . $name . '/install.lock';
         if (file_exists($install_lock)) {
             return $this->error('已经安装，若要重装请先卸载！');
         }
 
-        $plugin_dir = Framework::getRoot() . '/plugin/' . $name;
-        if (file_exists($plugin_dir . '/install.php')) {
-            includeFile($plugin_dir . '/install.php');
+        $loader = new ClassLoader();
+        $loader->addPsr4(
+            str_replace(['-', '/'], ['', '\\'], ucwords('App\\' . $name . '\\', '/\\-')),
+            Framework::getRoot() . '/' . $name . '/src/library/'
+        );
+        $loader->register();
+
+        $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('\\App\\' . $name . '\\App', '/\\-'));
+        $action = 'onInstall';
+        if (method_exists($class_name, $action)) {
+            Framework::execute([$class_name, $action]);
         }
 
         if (!is_dir(dirname($install_lock))) {

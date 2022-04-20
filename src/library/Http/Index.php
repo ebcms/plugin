@@ -5,43 +5,61 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Http;
 
 use App\Ebcms\Admin\Http\Common;
-use DigPHP\Framework\Framework;
 use DigPHP\Template\Template;
-use Psr\Http\Message\ResponseInterface;
+use Ebcms\Framework\AppInterface;
+use Ebcms\Framework\Framework;
+use ReflectionClass;
 use SplPriorityQueue;
 
 class Index extends Common
 {
     public function get(
         Template $template
-    ): ResponseInterface {
+    ) {
+
         $plugins = [];
-        foreach (glob(Framework::getRoot() . '/plugin/*/plugin.json') as $value) {
-            $name = pathinfo(dirname($value), PATHINFO_FILENAME);
-            $info = array_merge([
-                'name' => '',
-                'version' => '',
-                'title' => '',
-                'description' => '',
-                'icon' => '',
-                'license' => '',
-            ], (array)json_decode(file_get_contents($value), true));
-            $info['_install'] = file_exists(Framework::getRoot() . '/config/plugin/' . $name . '/install.lock');
-            $info['_disabled'] = file_exists(Framework::getRoot() . '/config/plugin/' . $name . '/disabled.lock');
-            $info['_menus'] = iterator_to_array($this->getMenus($name));
-            $plugins[$name] = $info;
+
+        foreach (glob(Framework::getRoot() . '/plugin/*/src/library/App.php') as $file) {
+
+            $app = substr($file, strlen(Framework::getRoot() . '/'), -strlen('/src/library/App.php'));
+            require_once $file;
+
+            $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('\\App\\' . $app . '\\App', '/\\-'));
+            if (
+                !class_exists($class_name)
+                || !is_subclass_of($class_name, AppInterface::class)
+            ) {
+                continue;
+            }
+
+            $json_file = Framework::getRoot() . '/' . $app . '/plugin.json';
+            $json = file_exists($json_file) ? json_decode(file_get_contents($json_file), true) : [];
+
+            $plugins[] = [
+                'name' => $app,
+                'version' => $json['version'] ?? '',
+                'title' => $json['title'] ?? '',
+                'description' => $json['description'] ?? '',
+                'icon' => $json['icon'] ?? '',
+                'install' => file_exists(Framework::getRoot() . '/config/' . $app . '/install.lock'),
+                'disabled' => file_exists(Framework::getRoot() . '/config/' . $app . '/disabled.lock'),
+                'menus' => iterator_to_array($this->getMenuList($app))
+            ];
         }
 
-        $html = $template->renderFromFile('index@ebcms/plugin', [
+        return $template->renderFromFile('index@ebcms/plugin', [
             'plugins' => $plugins,
         ]);
-        return $this->html($html);
     }
 
-    private function getMenus($name)
+    private function getMenuList($plugin)
     {
         $args = [];
-        $config_file = Framework::getRoot() . '/plugin/' . $name . '/src/config/admin.php';
+
+        $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('\\App\\' . $plugin . '\\App', '/\\-'));
+        $reflector = new ReflectionClass($class_name);
+        $config_file = dirname(dirname($reflector->getFileName())) . '/config/admin.php';
+
         if (is_file($config_file)) {
             $tmp = $this->requireFile($config_file);
             if (!is_null($tmp)) {
@@ -49,7 +67,7 @@ class Index extends Common
             }
         }
 
-        $config_file = Framework::getRoot() . '/config/plugin/' . $name . '/admin.php';
+        $config_file = Framework::getRoot() . '/config/' . $plugin . '/admin.php';
         if (is_file($config_file)) {
             $tmp = $this->requireFile($config_file);
             if (!is_null($tmp)) {
@@ -59,25 +77,22 @@ class Index extends Common
 
         $cfg = $args ? array_merge(...$args) : null;
 
-        $menus = new SplPriorityQueue;
-
+        $res = new SplPriorityQueue;
         foreach ($cfg['menus'] ?? [] as $menu) {
             $menu = array_merge([
                 'title' => '',
                 'url' => '',
-                'icon' => 'data:image/svg+xml;base64,' . base64_encode('<svg class="icon" style="width: 1em;height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12938"><path d="" p-id="12939"></path></svg>'),
-                'badge' => '',
                 'priority' => 50,
             ], (array) $menu);
             if (
                 $menu['title']
                 && $menu['url']
             ) {
-                $menus->insert($menu, $menu['priority']);
+                $res->insert($menu, $menu['priority']);
             }
         }
 
-        return $menus;
+        return $res;
     }
 
     private function requireFile(string $file)

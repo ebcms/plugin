@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Http;
 
 use App\Ebcms\Admin\Http\Common;
-use DigPHP\Framework\Framework;
+use Composer\InstalledVersions;
 use DigPHP\Request\Request;
-
-use function Composer\Autoload\includeFile;
+use Ebcms\Framework\Framework;
 
 class Uninstall extends Common
 {
@@ -17,20 +16,24 @@ class Uninstall extends Common
         Request $request
     ) {
         $name = $request->post('name');
+        if (InstalledVersions::isInstalled($name)) {
+            return $this->error('系统应用不支持该操作！');
+        }
 
-        $install_lock = Framework::getRoot() . '/config/plugin/' . $name . '/install.lock';
+        $install_lock = Framework::getRoot() . '/config/' . $name . '/install.lock';
         if (!file_exists($install_lock)) {
             return $this->error('未安装！');
         }
 
-        $disabled_lock = Framework::getRoot() . '/config/plugin/' . $name . '/disabled.lock';
+        $disabled_lock = Framework::getRoot() . '/config/' . $name . '/disabled.lock';
         if (!file_exists($disabled_lock)) {
             return $this->error('请先停用！');
         }
 
-        $plugin_dir = Framework::getRoot() . '/plugin/' . $name;
-        if (file_exists($plugin_dir . '/uninstall.php')) {
-            includeFile($plugin_dir . '/uninstall.php');
+        $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('\\App\\' . $name . '\\App', '/\\-'));
+        $action = 'onUninstall';
+        if (method_exists($class_name, $action)) {
+            Framework::execute([$class_name, $action]);
         }
 
         unlink($install_lock);
