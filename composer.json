@@ -3,6 +3,7 @@
     "description": "插件系统",
     "license": "GPL-3.0",
     "require": {
+        "diggphp/plugin": "^1.0",
         "ebcms/admin": "^1.0"
     },
     "autoload": {
