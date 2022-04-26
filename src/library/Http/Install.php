@@ -7,8 +7,8 @@ namespace App\Ebcms\Plugin\Http;
 use App\Ebcms\Admin\Http\Common;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
-use DigPHP\Request\Request;
-use Ebcms\Framework\Framework;
+use DiggPHP\Request\Request;
+use DiggPHP\Framework\Framework;
 
 class Install extends Common
 {

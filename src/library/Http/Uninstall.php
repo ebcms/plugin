@@ -6,8 +6,8 @@ namespace App\Ebcms\Plugin\Http;
 
 use App\Ebcms\Admin\Http\Common;
 use Composer\InstalledVersions;
-use DigPHP\Request\Request;
-use Ebcms\Framework\Framework;
+use DiggPHP\Request\Request;
+use DiggPHP\Framework\Framework;
 
 class Uninstall extends Common
 {

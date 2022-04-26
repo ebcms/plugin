@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Http;
 
 use App\Ebcms\Admin\Http\Common;
-use DigPHP\Template\Template;
-use Ebcms\Framework\Framework;
+use DiggPHP\Template\Template;
+use DiggPHP\Framework\Framework;
 
 class Index extends Common
 {
