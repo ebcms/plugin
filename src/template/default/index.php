@@ -94,7 +94,12 @@
 <div class="container">
     <div class="my-4">
         <div class="h1">插件管理</div>
-        <div class="text-muted fw-light">可以通过插件扩展系统功能~</div>
+        <div class="text-muted fw-light">
+            <span>插件位于<code>/plugin</code>目录</span>
+            {if in_array('ebcms/store', $framework->getAppList())}
+            <span>，您可以通过<a href="{echo $router->build('/ebcms/store/index')}" class="mx-1 fw-bold">插件市场</a>安装更多插件~</span>
+            {/if}
+        </div>
     </div>
     <div class="d-flex flex-column gap-4">
         {foreach $plugins as $plugin}
