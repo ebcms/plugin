@@ -2,6 +2,7 @@
     "name": "ebcms/plugin",
     "description": "插件商店",
     "license": "GPL-3.0",
+    "type": "psrapp",
     "require": {
         "psrphp/admin": "^1.0"
     },
