@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ebcms\Plugin\Http;
 
-use App\Ebcms\Admin\Http\Common;
-use App\Ebcms\Admin\Lib\Zip;
+use App\Psrphp\Admin\Http\Common;
+use App\Psrphp\Admin\Lib\Zip;
 use Composer\Autoload\ClassLoader;
 use PsrPHP\Session\Session;
 use ReflectionClass;

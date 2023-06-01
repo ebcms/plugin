@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ebcms\Plugin\Http;
 
-use App\Ebcms\Admin\Http\Common;
-use App\Ebcms\Admin\Lib\Dir;
+use App\Psrphp\Admin\Http\Common;
+use App\Psrphp\Admin\Lib\Dir;
 use Exception;
 use PsrPHP\Session\Session;
 use Throwable;

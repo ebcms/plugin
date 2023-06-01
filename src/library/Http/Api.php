@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ebcms\Plugin\Http;
 
-use App\Ebcms\Admin\Traits\ResponseTrait;
-use App\Ebcms\Admin\Traits\RestfulTrait;
+use App\Psrphp\Admin\Traits\ResponseTrait;
+use App\Psrphp\Admin\Traits\RestfulTrait;
 use PsrPHP\Psr16\LocalAdapter;
 use PsrPHP\Request\Request;
 

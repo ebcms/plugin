@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ebcms\Plugin\Http;
 
-use App\Ebcms\Admin\Http\Common;
-use App\Ebcms\Admin\Lib\Curl;
+use App\Psrphp\Admin\Http\Common;
+use App\Psrphp\Admin\Lib\Curl;
 use PsrPHP\Session\Session;
 use Throwable;
 

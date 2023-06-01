@@ -1,4 +1,4 @@
-{include common/header@ebcms/admin}
+{include common/header@psrphp/admin}
 <div class="container">
     <div class="h1 my-4">应用商店</div>
     <div class="my-4 d-flex flex-column gap-4">
@@ -223,4 +223,4 @@
         }
     });
 </script>
-{include common/footer@ebcms/admin}
+{include common/footer@psrphp/admin}
