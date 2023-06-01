@@ -6,6 +6,7 @@ namespace App\Ebcms\Plugin\Http;
 
 use App\Psrphp\Admin\Http\Common;
 use App\Psrphp\Admin\Lib\Curl;
+use App\Psrphp\Admin\Lib\Response;
 use PsrPHP\Session\Session;
 use Throwable;
 
@@ -18,22 +19,22 @@ class Download extends Common
         try {
             $item = $session->get('item');
             if (false === $content = $curl->get($item['source'])) {
-                return $this->error('文件下载失败~');
+                return Response::error('文件下载失败~');
             }
 
             if (md5($content) != $item['md5']) {
-                return $this->error('文件校验失败！');
+                return Response::error('文件校验失败！');
             }
 
             $tmpfile = tempnam(sys_get_temp_dir(), 'plugininstall');
             if (false == file_put_contents($tmpfile, $content)) {
-                return $this->error('文件(' . $tmpfile . ')写入失败，请检查权限~');
+                return Response::error('文件(' . $tmpfile . ')写入失败，请检查权限~');
             }
             $item['tmpfile'] = $tmpfile;
             $session->set('item', $item);
-            return $this->success('下载成功！', $item);
+            return Response::success('下载成功！', $item);
         } catch (Throwable $th) {
-            return $this->error($th->getMessage());
+            return Response::error($th->getMessage());
         }
     }
 }

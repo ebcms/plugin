@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Http;
 
 use App\Psrphp\Admin\Http\Common;
+use App\Psrphp\Admin\Lib\Response;
 use Composer\Autoload\ClassLoader;
 use PsrPHP\Session\Session;
 use PsrPHP\Framework\Framework;
@@ -22,7 +23,7 @@ class Install extends Common
 
             $json_file = $item['item_path'] . '/config.json';
             if (!is_file($json_file)) {
-                return $this->error('文件无效！');
+                return Response::error('文件无效！');
             }
             $json = (array) json_decode(file_get_contents($json_file), true);
             if (
@@ -31,11 +32,11 @@ class Install extends Common
                 !isset($json['version']) ||
                 $json['version'] != $item['version']
             ) {
-                return $this->error('文件无效！');
+                return Response::error('文件无效！');
             }
 
             $lock_file = $root . '/config/plugin/' . $item['name'] . '/install.lock';
-            $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('App\\' . $item['name'] . '\\App', '/\\-'));
+            $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('App\\' . $item['name'] . '\\PsrPHP\\Script', '/\\-'));
             $action = is_file($lock_file) ? 'onUpdate' : 'onInstall';
             if (method_exists($class_name, $action)) {
                 Framework::execute([$class_name, $action]);
@@ -55,9 +56,9 @@ class Install extends Common
 
             $session->delete('item');
 
-            return $this->success('安装成功!');
+            return Response::success('安装成功!');
         } catch (Throwable $th) {
-            return $this->error($th->getMessage());
+            return Response::error($th->getMessage());
         }
     }
 }

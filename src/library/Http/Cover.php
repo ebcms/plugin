@@ -6,6 +6,7 @@ namespace App\Ebcms\Plugin\Http;
 
 use App\Psrphp\Admin\Http\Common;
 use App\Psrphp\Admin\Lib\Dir;
+use App\Psrphp\Admin\Lib\Response;
 use PsrPHP\Session\Session;
 use Exception;
 use Throwable;
@@ -21,9 +22,9 @@ class Cover extends Common
             $item = $session->get('item');
             $dir->del($item['item_path']);
             $this->unZip($item['tmpfile'], $item['item_path']);
-            return $this->success('文件更新成功!');
+            return Response::success('文件更新成功!');
         } catch (Throwable $th) {
-            return $this->error($th->getMessage());
+            return Response::error($th->getMessage());
         }
     }
 

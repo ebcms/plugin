@@ -6,6 +6,7 @@ namespace App\Ebcms\Plugin\Http;
 
 use App\Psrphp\Admin\Http\Common;
 use App\Ebcms\Plugin\Model\Server;
+use App\Psrphp\Admin\Lib\Response;
 use Composer\Autoload\ClassLoader;
 use PsrPHP\Request\Request;
 use ReflectionClass;
@@ -30,11 +31,11 @@ class Check extends Common
             }
             $res = $server->query('/check', $param);
             if ($res['errcode']) {
-                return $this->error($res['message'], $res['redirect_url'] ?? '', $res['errcode'], $res['data'] ?? null);
+                return Response::error($res['message'], $res['redirect_url'] ?? '', $res['errcode'], $res['data'] ?? null);
             }
-            return $this->success($res['message'], $res['data'] ?? null);
+            return Response::success($res['message'], $res['data'] ?? null);
         } catch (Throwable $th) {
-            return $this->error($th->getMessage());
+            return Response::error($th->getMessage());
         }
     }
 }

@@ -6,6 +6,7 @@ namespace App\Ebcms\Plugin\Http;
 
 use App\Psrphp\Admin\Http\Common;
 use App\Psrphp\Admin\Lib\Dir;
+use App\Psrphp\Admin\Lib\Response;
 use Exception;
 use PsrPHP\Session\Session;
 use Throwable;
@@ -23,7 +24,7 @@ class Rollback extends Common
             $dir->del($item['item_path']);
             $this->unZip($item['backup_file'], $item['item_path']);
         } catch (Throwable $th) {
-            return $this->error('还原失败：' . $th->getMessage());
+            return Response::error('还原失败：' . $th->getMessage());
         }
     }
 
