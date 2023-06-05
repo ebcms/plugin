@@ -64,32 +64,20 @@ class Server
     public function getInstalled(): array
     {
         $res = [];
-
         $root = dirname(dirname(dirname((new ReflectionClass(InstalledVersions::class))->getFileName())));
-        foreach (glob($root . '/plugin/*/src/library/App.php') as $file) {
-
-            $name = substr($file, strlen($root . '/plugin/'), -strlen('/src/library/App.php'));
-
-            if (file_exists($root . '/config/plugin/' . $name . '/disabled.lock')) {
+        foreach (Framework::getAppList() as $name => $app) {
+            if (InstalledVersions::isInstalled($app['name'])) {
                 continue;
             }
-
-            if (!file_exists($root . '/config/plugin/' . $name . '/install.lock')) {
+            $json_file = $root . '/' . $name . '/config.json';
+            if (!file_exists($json_file)) {
                 continue;
             }
-
-            $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('App\\Plugin\\' . $name . '\\App', '/\\-'));
-            if (
-                !class_exists($class_name)
-                || !is_subclass_of($class_name, AppInterface::class)
-            ) {
+            $json = json_decode(file_get_contents($json_file), true);
+            if (!isset($json['id'])) {
                 continue;
             }
-
-            $json_file = $root . '/plugin/' . $name . '/config.json';
-            $json = file_exists($json_file) ? json_decode(file_get_contents($json_file), true) : [];
-
-            $res[$name] = $json['version'] ?? '0.0.0.0';
+            $res[] = $json;
         }
         return $res;
     }
