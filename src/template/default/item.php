@@ -20,8 +20,10 @@
             <button class="btn btn-primary" onclick="EBCMS.handler();" id="handler">一键安装</button>
             {elseif $type == 'upgrade'}
             <button class="btn btn-primary" onclick="EBCMS.handler();" id="handler">一键升级</button>
+            {elseif $type == 'error'}
+            <button class="btn btn-primary">与本地插件冲突</button>
             {else}
-            <button class="btn btn-primary" disabled>本地插件冲突</button>
+            <button class="btn btn-primary" disabled>暂无更新</button>
             {/if}
         </div>
         <div class="console p-3 text-white bg-dark overflow-auto" style="height: 300px;"></div>

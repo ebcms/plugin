@@ -39,21 +39,22 @@ class Item extends Common
         }
         $json_file = $root . '/plugin/' . $item['name'] . '/config.json';
         if (!file_exists($json_file)) {
-            return '';
+            return 'error';
         }
         $json = json_decode(file_get_contents($json_file), true);
         if (!isset($json['id'])) {
-            return '';
+            return 'error';
         }
         if ($json['id'] != $item['id']) {
-            return '';
+            return 'error';
         }
         if (!isset($json['version'])) {
-            return '';
+            return 'error';
         }
         if ($json['version'] != $item['version']) {
             return 'upgrade';
+        } else {
+            return '';
         }
-        return '';
     }
 }

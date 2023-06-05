@@ -9,16 +9,20 @@ use PsrPHP\Router\Router;
 use PsrPHP\Framework\Config;
 use PsrPHP\Framework\Framework;
 use Exception;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Throwable;
 
 class Server
 {
     private $api;
+    private $log;
 
     public function __construct(
-        Config $config
+        Config $config,
+        LoggerInterface $log
     ) {
+        $this->log = $log;
         $this->api = $config->get('api.host@ebcms/plugin', 'https://www.ebcms.com/index.php/plugin/plugin/api');
     }
 
@@ -27,6 +31,11 @@ class Server
         try {
             $url = $this->api . $path . '?' . http_build_query($this->getCommonParam());
             $response = $this->post($url, $param);
+            $this->log->debug('ebcms.store', [
+                'path' => $path,
+                'param' => $param,
+                'response' => $response
+            ]);
             $res = (array) json_decode($response, true);
             if (!isset($res['errcode'])) {
                 return [
