@@ -20,21 +20,6 @@ class Install extends Common
         try {
             $item = $session->get('item');
             $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
-
-            $json_file = $item['item_path'] . '/config.json';
-            if (!is_file($json_file)) {
-                return Response::error('文件无效！');
-            }
-            $json = (array) json_decode(file_get_contents($json_file), true);
-            if (
-                !isset($json['name']) ||
-                $json['name'] != $item['name'] ||
-                !isset($json['version']) ||
-                $json['version'] != $item['version']
-            ) {
-                return Response::error('文件无效！');
-            }
-
             $lock_file = $root . '/config/plugin/' . $item['name'] . '/install.lock';
             $class_name = str_replace(['-', '/'], ['', '\\'], ucwords('App\\' . $item['name'] . '\\PsrPHP\\Script', '/\\-'));
             $action = is_file($lock_file) ? 'onUpdate' : 'onInstall';

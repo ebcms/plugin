@@ -20,7 +20,20 @@ class Cover extends Common
     ) {
         try {
             $item = $session->get('item');
-            $dir->del($item['item_path']);
+            if (is_dir($item['item_path'])) {
+                $json_file = $item['item_path'] . '/config.json';
+                if (!file_exists($json_file)) {
+                    return Response::error('配置文件不存在，覆盖失败~');
+                }
+                $json = json_decode(file_get_contents($json_file), true);
+                if (!isset($json['id'])) {
+                    return Response::error('配置文件ID未设置，不支持覆盖~');
+                }
+                if ($json['id'] != $item['id']) {
+                    return Response::error('配置文件ID和服务器插件id不一样，不支持覆盖~');
+                }
+                $dir->del($item['item_path']);
+            }
             $this->unZip($item['tmpfile'], $item['item_path']);
             return Response::success('文件更新成功!');
         } catch (Throwable $th) {

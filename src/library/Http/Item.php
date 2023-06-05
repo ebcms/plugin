@@ -7,8 +7,10 @@ namespace App\Ebcms\Plugin\Http;
 use App\Psrphp\Admin\Http\Common;
 use App\Ebcms\Plugin\Model\Server;
 use App\Psrphp\Admin\Lib\Response;
+use Composer\Autoload\ClassLoader;
 use PsrPHP\Request\Request;
 use PsrPHP\Template\Template;
+use ReflectionClass;
 
 class Item extends Common
 {
@@ -17,21 +19,41 @@ class Item extends Common
         Server $server,
         Template $template
     ) {
-        $data = [];
         $res = $server->query('/detail', [
-            'name' => $request->get('name'),
+            'id' => $request->get('id'),
         ]);
         if ($res['errcode']) {
             return Response::error($res['message'], $res['redirect_url'] ?? '', $res['errcode']);
         }
-        $data['plugin'] = $res['data'];
-        $data['type'] = 'install';
-        $installed = $server->getInstalled();
-        if (isset($installed[$request->get('name')])) {
-            $data['type'] = 'upgrade';
-        } else {
-            $data['type'] = 'install';
+        return $template->renderFromFile('item@ebcms/plugin', [
+            'plugin' => $res['data'],
+            'type' => $this->getType($res['data']),
+        ]);
+    }
+
+    private function getType(array $item): string
+    {
+        $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
+        if (!is_dir($root . '/plugin/' . $item['name'])) {
+            return 'install';
         }
-        return $template->renderFromFile('item@ebcms/plugin', $data);
+        $json_file = $root . '/plugin/' . $item['name'] . '/config.json';
+        if (!file_exists($json_file)) {
+            return '';
+        }
+        $json = json_decode(file_get_contents($json_file), true);
+        if (!isset($json['id'])) {
+            return '';
+        }
+        if ($json['id'] != $item['id']) {
+            return '';
+        }
+        if (!isset($json['version'])) {
+            return '';
+        }
+        if ($json['version'] != $item['version']) {
+            return 'upgrade';
+        }
+        return '';
     }
 }

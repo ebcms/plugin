@@ -12,7 +12,6 @@ use PsrPHP\Psr16\LocalAdapter;
 use PsrPHP\Request\Request;
 use PsrPHP\Router\Router;
 use PsrPHP\Session\Session;
-use PsrPHP\Framework\Framework;
 use ReflectionClass;
 use Throwable;
 
@@ -28,19 +27,28 @@ class Source extends Common
         try {
             $token = 'plugin_' . md5(uniqid() . rand(10000000, 99999999));
             $cache->set('pluginapitoken', $token, 30);
-            $name = $request->get('name');
+
             $param = [
                 'api' => $router->build('/ebcms/plugin/api', [
                     'token' => $token
                 ]),
-                'name' => $name,
             ];
+
+            $name = $request->get('name');
             $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
             $json_file = $root . '/plugin/' . $name . '/config.json';
-            if (file_exists($json_file)) {
-                $json = json_decode(file_get_contents($json_file), true);
-                $param['version'] = $json['version'];
+            if (!file_exists($json_file)) {
+                return Response::error('配置文件不存在，可能非官方插件~');
             }
+            $json = json_decode(file_get_contents($json_file), true);
+            if (!isset($json['id'])) {
+                return Response::error('非官方市场插件~');
+            }
+            $param['id'] = $json['id'];
+            if (!isset($json['version'])) {
+                return Response::error('无法确定本地版本号，可能非官方插件~');
+            }
+            $param['version'] = $json['version'];
 
             $res = $server->query('/source', $param);
             if ($res['errcode']) {

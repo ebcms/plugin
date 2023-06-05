@@ -6,7 +6,6 @@ namespace App\Ebcms\Plugin\Model;
 
 use Composer\InstalledVersions;
 use PsrPHP\Router\Router;
-use PsrPHP\Framework\AppInterface;
 use PsrPHP\Framework\Config;
 use PsrPHP\Framework\Framework;
 use Exception;
@@ -17,8 +16,9 @@ class Server
 {
     private $api;
 
-    public function __construct(Config $config)
-    {
+    public function __construct(
+        Config $config
+    ) {
         $this->api = $config->get('api.host@ebcms/plugin', 'https://www.ebcms.com/index.php/plugin/plugin/api');
     }
 
@@ -77,7 +77,10 @@ class Server
             if (!isset($json['id'])) {
                 continue;
             }
-            $res[] = $json;
+            $res[] = [
+                'id' => $json['id'],
+                'version' => $json['version'],
+            ];
         }
         return $res;
     }
