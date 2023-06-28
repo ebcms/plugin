@@ -15,8 +15,7 @@ use ZipArchive;
 class Cover extends Common
 {
     public function get(
-        Session $session,
-        Dir $dir
+        Session $session
     ) {
         try {
             $item = $session->get('item');
@@ -32,7 +31,7 @@ class Cover extends Common
                 if ($json['id'] != $item['id']) {
                     return Response::error('配置文件ID和服务器插件id不一样，不支持覆盖~');
                 }
-                $dir->del($item['item_path']);
+                Dir::del($item['item_path']);
             }
             $this->unZip($item['tmpfile'], $item['item_path']);
             return Response::success('文件更新成功!');

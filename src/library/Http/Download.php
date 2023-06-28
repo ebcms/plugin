@@ -13,12 +13,11 @@ use Throwable;
 class Download extends Common
 {
     public function get(
-        Session $session,
-        Curl $curl
+        Session $session
     ) {
         try {
             $item = $session->get('item');
-            if (false === $content = $curl->get($item['source'])) {
+            if (false === $content = Curl::get($item['source'])) {
                 return Response::error('文件下载失败~');
             }
 

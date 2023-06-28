@@ -16,12 +16,11 @@ class Rollback extends Common
 {
 
     public function get(
-        Session $session,
-        Dir $dir
+        Session $session
     ) {
         try {
             $item = $session->get('item');
-            $dir->del($item['item_path']);
+            Dir::del($item['item_path']);
             $this->unZip($item['backup_file'], $item['item_path']);
         } catch (Throwable $th) {
             return Response::error('还原失败：' . $th->getMessage());
