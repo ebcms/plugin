@@ -29,7 +29,7 @@
             EBCMS.console(message, 'red');
             EBCMS.console("完毕<hr>");
             EBCMS.state = 0;
-            $("#handler").removeClass('btn-warning').addClass('btn-primary').html('一键升级');
+            $("#handler").removeClass('btn-warning').addClass('btn-primary').html('一键安装');
         };
         EBCMS.handler = function() {
             if (EBCMS.state) {
