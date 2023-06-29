@@ -20,19 +20,24 @@ class Check extends Common
     ) {
         try {
             $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
-            $json_file = $root . '/plugin/' . $request->get('name') . '/config.json';
-            if (!file_exists($json_file)) {
-                return Response::error('配置文件不存在，可能非官方插件~');
+            $param['name'] = $request->get('name');
+            if (is_dir($root . '/plugin/' . $request->get('name'))) {
+                $json_file = $root . '/plugin/' . $request->get('name') . '/config.json';
+                if (!file_exists($json_file)) {
+                    return Response::error('与本地插件冲突~');
+                }
+                $json = json_decode(file_get_contents($json_file), true);
+                if (!isset($json['name'])) {
+                    return Response::error('与本地插件冲突~');
+                }
+                if ($json['name'] != $request->get('name')) {
+                    return Response::error('与本地插件冲突~');
+                }
+                if (!isset($json['version'])) {
+                    return Response::error('与本地插件冲突~');
+                }
+                $param['version'] = $json['version'];
             }
-            $json = json_decode(file_get_contents($json_file), true);
-            if (!isset($json['id'])) {
-                return Response::error('非官方市场插件~');
-            }
-            $param['id'] = $json['id'];
-            if (!isset($json['version'])) {
-                return Response::error('无法确定本地版本号，可能非官方插件~');
-            }
-            $param['version'] = $json['version'];
             $res = $server->query('/check', $param);
             if ($res['errcode']) {
                 return Response::error($res['message'], $res['redirect_url'] ?? '', $res['errcode'], $res['data'] ?? null);

@@ -27,28 +27,33 @@ class Source extends Common
         try {
             $token = 'plugin_' . md5(uniqid() . rand(10000000, 99999999));
             $cache->set('pluginapitoken', $token, 30);
+            $name = $request->get('name');
+            $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
 
             $param = [
                 'api' => $router->build('/ebcms/plugin/api', [
                     'token' => $token
                 ]),
+                'name' => $name,
             ];
 
-            $name = $request->get('name');
-            $root = dirname(dirname(dirname((new ReflectionClass(ClassLoader::class))->getFileName())));
-            $json_file = $root . '/plugin/' . $name . '/config.json';
-            if (!file_exists($json_file)) {
-                return Response::error('配置文件不存在，可能非官方插件~');
+            if (is_dir($root . '/plugin/' . $name)) {
+                $json_file = $root . '/plugin/' . $name . '/config.json';
+                if (!file_exists($json_file)) {
+                    return Response::error('与本地插件冲突~');
+                }
+                $json = json_decode(file_get_contents($json_file), true);
+                if (!isset($json['name'])) {
+                    return Response::error('与本地插件冲突~');
+                }
+                if ($json['name'] != $request->get('name')) {
+                    return Response::error('与本地插件冲突~');
+                }
+                if (!isset($json['version'])) {
+                    return Response::error('与本地插件冲突~');
+                }
+                $param['version'] = $json['version'];
             }
-            $json = json_decode(file_get_contents($json_file), true);
-            if (!isset($json['id'])) {
-                return Response::error('非官方市场插件~');
-            }
-            $param['id'] = $json['id'];
-            if (!isset($json['version'])) {
-                return Response::error('无法确定本地版本号，可能非官方插件~');
-            }
-            $param['version'] = $json['version'];
 
             $res = $server->query('/source', $param);
             if ($res['errcode']) {

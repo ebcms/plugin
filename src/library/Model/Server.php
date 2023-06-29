@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Ebcms\Plugin\Model;
 
 use Composer\InstalledVersions;
-use PsrPHP\Router\Router;
+use Exception;
 use PsrPHP\Framework\Config;
 use PsrPHP\Framework\Framework;
-use Exception;
+use PsrPHP\Router\Router;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Throwable;
@@ -34,7 +34,7 @@ class Server
             $this->log->debug('ebcms.store', [
                 'path' => $path,
                 'param' => $param,
-                'response' => $response
+                'response' => $response,
             ]);
             $res = (array) json_decode($response, true);
             if (!isset($res['errcode'])) {
@@ -83,11 +83,17 @@ class Server
                 continue;
             }
             $json = json_decode(file_get_contents($json_file), true);
-            if (!isset($json['id'])) {
+            if (!isset($json['name'])) {
+                continue;
+            }
+            if (!isset($json['version'])) {
+                continue;
+            }
+            if ($json['name'] != $name) {
                 continue;
             }
             $res[] = [
-                'id' => $json['id'],
+                'name' => $json['name'],
                 'version' => $json['version'],
             ];
         }
@@ -104,7 +110,7 @@ class Server
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Length: ' . strlen($data),
             'Accept: application/json',
-            'Content-Type: application/x-www-form-urlencoded'
+            'Content-Type: application/x-www-form-urlencoded',
         ));
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);

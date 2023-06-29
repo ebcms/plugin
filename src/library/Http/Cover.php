@@ -22,14 +22,14 @@ class Cover extends Common
             if (is_dir($item['item_path'])) {
                 $json_file = $item['item_path'] . '/config.json';
                 if (!file_exists($json_file)) {
-                    return Response::error('配置文件不存在，覆盖失败~');
+                    return Response::error('与本地插件冲突~');
                 }
                 $json = json_decode(file_get_contents($json_file), true);
-                if (!isset($json['id'])) {
-                    return Response::error('配置文件ID未设置，不支持覆盖~');
+                if (!isset($json['name'])) {
+                    return Response::error('与本地插件冲突~');
                 }
-                if ($json['id'] != $item['id']) {
-                    return Response::error('配置文件ID和服务器插件id不一样，不支持覆盖~');
+                if ($json['name'] != $item['name']) {
+                    return Response::error('与本地插件冲突~');
                 }
                 Dir::del($item['item_path']);
             }
