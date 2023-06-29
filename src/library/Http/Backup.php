@@ -26,7 +26,9 @@ class Backup extends Common
             $item['backup_file'] = $root . '/backup/plugin_' . $item['name'] . '_' . date('YmdHis') . '.zip';
 
             $zip->open($item['backup_file'], ZipArchive::CREATE);
-            $zip->addDirectory($item['item_path'], $item['item_path'] . '/');
+            if (is_dir($item['item_path'])) {
+                $zip->addDirectory($item['item_path'], $item['item_path'] . '/');
+            }
             $zip->close();
 
             $session->set('item', $item);
